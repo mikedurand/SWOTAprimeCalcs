@@ -1,0 +1,24 @@
+
+Rivers(cf).Name=ncread([pathtoncfiles Files(cf).name],'/River_Info/Name')';
+Rivers(cf).QWBM=ncread([pathtoncfiles Files(cf).name],'/River_Info/QWBM');
+%Rivers(cf).wc=ncread([pathtoncfiles Files(cf).name],'/River_Info/wc');
+Rivers(cf).rch_bnd=ncread([pathtoncfiles Files(cf).name],'/River_Info/rch_bnd');
+Rivers(cf).gdrch=ncread([pathtoncfiles Files(cf).name],'/River_Info/gdrch');
+Rivers(cf).orbit=ncread([pathtoncfiles Files(cf).name],'/River_Info/orbit');
+Rivers(cf).Nodes.t=ncread([pathtoncfiles Files(cf).name],'/XS_Timeseries/t');
+Rivers(cf).Nodes.Z=ncread([pathtoncfiles Files(cf).name],'/XS_Timeseries/Z');
+Rivers(cf).Nodes.xs_rch=ncread([pathtoncfiles Files(cf).name],'/XS_Timeseries/xs_rch');
+Rivers(cf).Nodes.X=ncread([pathtoncfiles Files(cf).name],'/XS_Timeseries/X');
+Rivers(cf).Nodes.W=ncread([pathtoncfiles Files(cf).name],'/XS_Timeseries/W');
+Rivers(cf).Nodes.Q=ncread([pathtoncfiles Files(cf).name],'/XS_Timeseries/Q');
+Rivers(cf).Nodes.H=ncread([pathtoncfiles Files(cf).name],'/XS_Timeseries/H');
+Rivers(cf).Nodes.A=ncread([pathtoncfiles Files(cf).name],'/XS_Timeseries/A');
+Rivers(cf).Nodes.P=ncread([pathtoncfiles Files(cf).name],'/XS_Timeseries/P');
+Rivers(cf).Nodes.n=ncread([pathtoncfiles Files(cf).name],'/XS_Timeseries/n');
+Rivers(cf).Reaches.t=ncread([pathtoncfiles Files(cf).name],'/Reach_Timeseries/t');
+Rivers(cf).Reaches.W=ncread([pathtoncfiles Files(cf).name],'/Reach_Timeseries/W');
+Rivers(cf).Reaches.Q=ncread([pathtoncfiles Files(cf).name],'/Reach_Timeseries/Q');
+Rivers(cf).Reaches.H=ncread([pathtoncfiles Files(cf).name],'/Reach_Timeseries/H');
+Rivers(cf).Reaches.S=ncread([pathtoncfiles Files(cf).name],'/Reach_Timeseries/S');
+Rivers(cf).Reaches.A=ncread([pathtoncfiles Files(cf).name],'/Reach_Timeseries/A');
+Rivers(cf).Reaches.P=ncread([pathtoncfiles Files(cf).name],'/Reach_Timeseries/P'); 
