@@ -68,8 +68,13 @@ dAhat=sum(dA)-dAHbar;
 % Leaving it in case hooks are helpful in future. MD 5/11/18
 % dAunc=sqrt(VarBeta/4*(Hhat^2-Hbp(iReg)^2)^2 + p{iReg}(1)^2/4 * sigma_uu);
 
-% 
-dAunc=Wobs*sqrt(sigma_uu)*sqrt(2);
+% super simple approach: 
+% dAunc=Wobs*sqrt(sigma_uu)*sqrt(2);
+
+% Mark's "known slope approach"
+mu=sqrt(p{iReg}(1)/2)*(Hhat-Hbp(iReg)) + polyval(p{i},Hbp(iReg))/sqrt(2*p{iReg}(1));
+sigma=sqrt(p{iReg}(1)/2) * sqrt(sigma_uu);
+dAunc=sqrt(4*mu^2*sigma^2+2*sigma^4);
 
 end
 

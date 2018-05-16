@@ -49,7 +49,7 @@ grid on
 
 %% 5. Fitting funtions to the width & height data
 
-ReDoFits=true;
+ReDoFits=false;
 if ReDoFits
     stdH=0.1;
     stdW=10;
