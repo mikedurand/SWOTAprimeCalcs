@@ -23,8 +23,10 @@ for i=1:nReg
     iReg=x>=xbreak0(i) & x<xbreak0(i+1);
     if sum(iReg)>2
         p0{i}=polyfit(x(iReg),y(iReg),1);
-    else
+    elseif i>1
         p0{i}=p0{1};
+    else
+        p0{i}=[100 min(y)];
     end
     p0hat=[p0hat p0{i}];
 end
