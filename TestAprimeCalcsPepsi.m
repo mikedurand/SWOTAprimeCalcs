@@ -10,7 +10,7 @@ addpath('./PepsiSrc');
 % So far, I've just looked at example cases on the Sacramento Upstream (cf=13) 
 % and Garonne Downstream  (cf=4) from the Pepsi 1. 
 %%
-cf=4;
+cf=14;
 pathtoncfiles='./Pepsi1/';
 Files=dir([pathtoncfiles '*.nc']);
 numbfiles=size(Files,1);
@@ -34,7 +34,7 @@ end
 nObs=length(tObs);
 
 %% 4. Visualize height-width relationship 
-r=3;
+r=1;
 
 disp(['Working with reach ' num2str(r)])
 
@@ -49,7 +49,7 @@ grid on
 
 %% 5. Fitting funtions to the width & height data
 
-ReDoFits=false;
+ReDoFits=true;
 if ReDoFits
     stdH=0.1;
     stdW=10;
@@ -62,7 +62,13 @@ if ReDoFits
     
     for i=1:nR  %fit H-W functions
         disp(['Computing fit for reach ' num2str(i) '/' num2str(nR)])
-        [p{i},xbreak{i},iout{i},hval{i},wval{i}]=CalcWHFitsEIV(Hobs(i,:),Wobs(i,:),nReg,stdH,stdW);        
+        SpecialCases{i} = CheckSpecialCases(Wobs(i,:),stdW);
+        if SpecialCases{i}.LowWidthVar
+            p{i}{1}=[0 mean(Wobs(i,:))]; p{i}{2}=[]; p{i}{3}=[]; p{i}{4}=[];
+            xbreak{i}=[min(Hobs(i,:)) max(Hobs(i,:)) nan nan];
+        else
+            [p{i},xbreak{i},iout{i},hval{i},wval{i}]=CalcWHFitsEIV(Hobs(i,:),Wobs(i,:),nReg,stdH,stdW);        
+        end
     end
     save('WHFits.mat','p','xbreak','iout','hval','wval','Hobs','Hbar','Wobs','Wbar','stdH','stdW')
 else
