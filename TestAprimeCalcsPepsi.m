@@ -7,8 +7,8 @@ clear all; close all
 
 addpath('./PepsiSrc');
 %% 3. Setup: Read data and create synthetic observations
-% So far, I've just looked at example cases on the Sacramento Upstream (cf=13) 
-% and Garonne Downstream  (cf=4) from the Pepsi 1. 
+% So far, I've looked at example cases on the Sacramento Upstream (cf=13) 
+% Garonne Downstream  (cf=4), and Seine (cf=14) from the Pepsi 1. 
 %%
 cf=14;
 pathtoncfiles='./Pepsi1/';
@@ -65,12 +65,16 @@ if ReDoFits
         SpecialCases{i} = CheckSpecialCases(Wobs(i,:),stdW);
         if SpecialCases{i}.LowWidthVar
             p{i}{1}=[0 mean(Wobs(i,:))]; p{i}{2}=[]; p{i}{3}=[]; p{i}{4}=[];
-            xbreak{i}=[min(Hobs(i,:)) max(Hobs(i,:)) nan nan];
+            xbreak{i}=[min(Hobs(i,:)) max(Hobs(i,:)+1E-4) nan nan];
+            iout{i}=false(size(Wobs(i,:)));
+            [hval{i},wval{i}]=TestEvaluation(Hobs(i,:),xbreak{i},p{i},nReg);
+            UseReg{i}=[1 0 0 ];
         else
-            [p{i},xbreak{i},iout{i},hval{i},wval{i}]=CalcWHFitsEIV(Hobs(i,:),Wobs(i,:),nReg,stdH,stdW);        
+            [p{i},xbreak{i},iout{i},hval{i},wval{i}]=CalcWHFitsEIV(Hobs(i,:),Wobs(i,:),nReg,stdH,stdW);       
+            UseReg{i}=[1 1 1];
         end
     end
-    save('WHFits.mat','p','xbreak','iout','hval','wval','Hobs','Hbar','Wobs','Wbar','stdH','stdW')
+    save('WHFits.mat','p','xbreak','iout','hval','wval','Hobs','Hbar','Wobs','Wbar','stdH','stdW','UseReg')
 else
     load WHFits.mat
 end
@@ -95,10 +99,12 @@ ylabel('River width, m')
 title(['Fig. 2: Height-width fits & obs. for reach ' num2str(r)])
 grid on
 
-%% 6. Performing the$A \prime$calculations 
+%% 6. Performing the Aprime calculations 
 dAHbar=CalculatedAEIV(Hbar(r),Wbar(r),xbreak{r},p{r},nReg,0,stdW^2,stdH^2,m_zz(:,:,r),nObs); %sample calculation
 
-Htest=linspace(xbreak{r}(1)+.001,xbreak{r}(4)-.001,100);
+rMax=find(UseReg{r}, 1, 'last' );
+
+Htest=linspace(xbreak{r}(1)+.001,xbreak{r}(rMax+1)-.001,100);
 
 for i=1:length(Htest)
     [dAtest(i),Wtest(i)] = CalculatedAEIV(Htest(i),[],xbreak{r},p{r},nReg,dAHbar,stdW^2,stdH^2,m_zz(:,:,r),nObs); %sample calculation
@@ -117,7 +123,7 @@ disp(['Abar='  num2str(median(R.A(r,:))) ' m^2'])
 dAtrue=R.A(r,:)-median(R.A(r,:)); %true dA for comparison
 
 figure(3)
-plot(Reaches.H(r,tObs),dAtrue(tObs),'o',Htest,dAtest,Hbar(r),0,'ko','LineWidth',2)
+plot(R.H(r,tObs),dAtrue(tObs),'o',Htest,dAtest,Hbar(r),0,'ko','LineWidth',2)
 set(gca,'FontSize',14)
 xlabel('Height, m')
 ylabel('A'', m^2')

@@ -33,3 +33,5 @@ Rivers(cf).Reaches.P=Reaches.P(Rivers(cf).gdrch,:);
 for cr=1:length(Rivers(cf).gdrch)
     Rivers(cf).Reaches.x(cr)=mean(Nodes.X(Nodes.xs_rch == Rivers(cf).gdrch(cr)));
 end
+
+clear Nodes Reaches

@@ -38,12 +38,6 @@ for i=1:nReg
     p{i}=phat((i-1)*2+[1 2] );
 end
 
-%%
-hval=linspace(min(x),max(x),100);
-wval=[];
-for i=1:nReg
-    iVal=hval>=xbreak(i) & hval<xbreak(i+1);
-    wval=[wval polyval(p{i},hval(iVal))];
-end
+[hval,wval]=TestEvaluation(x,xbreak,p,nReg);
 
 end

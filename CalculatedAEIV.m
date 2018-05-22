@@ -64,6 +64,13 @@ dAhat=sum(dA)-dAHbar;
 %an EIV-based approach, but abandoned it. Implemented an OLS approach, but
 %it is not as rigorous as it should be.
 
+%when the "rectangular" special case is invoked
+if p{iReg}(1)==0
+    dAunc=p{iReg}(2)*sqrt(sigma_uu);
+    return
+end
+    
+
 % EIV approach: this is unreliable, and needs a more thorough derivation.
 % Leaving it in case hooks are helpful in future. MD 5/11/18
 % dAunc=sqrt(VarBeta/4*(Hhat^2-Hbp(iReg)^2)^2 + p{iReg}(1)^2/4 * sigma_uu);
@@ -72,7 +79,7 @@ dAhat=sum(dA)-dAHbar;
 % dAunc=Wobs*sqrt(sigma_uu)*sqrt(2);
 
 % Mark's "known slope approach"
-mu=sqrt(p{iReg}(1)/2)*(Hhat-Hbp(iReg)) + polyval(p{i},Hbp(iReg))/sqrt(2*p{iReg}(1));
+mu=sqrt(p{iReg}(1)/2)*(Hhat-Hbp(iReg)) + polyval(p{iReg},Hbp(iReg))/sqrt(2*p{iReg}(1));
 sigma=sqrt(p{iReg}(1)/2) * sqrt(sigma_uu);
 dAunc=sqrt(4*mu^2*sigma^2+2*sigma^4);
 
