@@ -10,7 +10,7 @@ addpath('./PepsiSrc');
 % So far, I've looked at example cases on the Sacramento Upstream (cf=13) 
 % Garonne Downstream  (cf=4), and Seine (cf=14) from the Pepsi 1. 
 %%
-cf=14;
+cf=10;
 pathtoncfiles='./Pepsi1/';
 Files=dir([pathtoncfiles '*.nc']);
 numbfiles=size(Files,1);
@@ -28,9 +28,10 @@ t=1:nt;
 % SWOT observation
 nCycle=floor(nt/21);
 nReg=3; %number of regions
-for i=2:nCycle
-    tObs=[tObs tObs(1:nObsCycle)+(i-1)*21];
-end
+% for i=2:nCycle
+%     tObs=[tObs tObs(1:nObsCycle)+(i-1)*21];
+% end
+tObs=t; 
 nObs=length(tObs);
 
 %% 4. Visualize height-width relationship 
