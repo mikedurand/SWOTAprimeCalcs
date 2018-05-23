@@ -17,7 +17,7 @@ numbfiles=size(Files,1);
 ReadRiver;
 FilterRiver;
 R=Rivers(cf).Reaches; 
-disp(['Working with: ' Rivers(cf).Name ' data.'])
+disp(['Working with ' Rivers(cf).Name ' data.'])
 tObs=ceil(Rivers(cf).orbit./86400)';
 nObsCycle=length(tObs);
 clear Rivers
@@ -35,7 +35,7 @@ tObs=t;
 nObs=length(tObs);
 
 %% 4. Visualize height-width relationship 
-r=1;
+r=4;
 
 disp(['Working with reach ' num2str(r)])
 
@@ -63,9 +63,19 @@ if ReDoFits
     
     for i=1:nR  %fit H-W functions
         disp(['Computing fit for reach ' num2str(i) '/' num2str(nR)])
-        SpecialCases{i} = CheckSpecialCases(Wobs(i,:),stdW);
+        SpecialCases{i} = CheckSpecialCases(Wobs(i,:),stdW,Hobs(i,:),stdH);
         if SpecialCases{i}.LowWidthVar
             p{i}{1}=[0 mean(Wobs(i,:))]; p{i}{2}=[]; p{i}{3}=[]; p{i}{4}=[];
+            xbreak{i}=[min(Hobs(i,:)) max(Hobs(i,:)+1E-4) nan nan];
+            iout{i}=false(size(Wobs(i,:)));
+            [hval{i},wval{i}]=TestEvaluation(Hobs(i,:),xbreak{i},p{i},nReg);
+            UseReg{i}=[1 0 0 ];
+        elseif SpecialCases{i}.LowHeightVar
+            p{i}{1}=polyfit(Hobs(i,:),Wobs(i,:),1);
+%             if var(Hobs(i,:))>1.25*stdH^2
+%                 p{i}{1}(1)=p{i}{1}(1)*var(Hobs)/(var(Hobs)-stdH^2); %Fuller's attenuation coefficient: untested so far
+%             end
+            p{i}{2}=[]; p{i}{3}=[]; p{i}{4}=[];
             xbreak{i}=[min(Hobs(i,:)) max(Hobs(i,:)+1E-4) nan nan];
             iout{i}=false(size(Wobs(i,:)));
             [hval{i},wval{i}]=TestEvaluation(Hobs(i,:),xbreak{i},p{i},nReg);
@@ -108,7 +118,7 @@ rMax=find(UseReg{r}, 1, 'last' );
 Htest=linspace(xbreak{r}(1)+.001,xbreak{r}(rMax+1)-.001,100);
 
 for i=1:length(Htest)
-    [dAtest(i),Wtest(i)] = CalculatedAEIV(Htest(i),[],xbreak{r},p{r},nReg,dAHbar,stdW^2,stdH^2,m_zz(:,:,r),nObs); %sample calculation
+    [dAtest(i)] = CalculatedAEIV(Htest(i),[],xbreak{r},p{r},nReg,dAHbar,stdW^2,stdH^2,m_zz(:,:,r),nObs); %sample calculation
 end
 
 [~,iSort]=sort(R.H(r,:));
@@ -174,3 +184,16 @@ Err.HeightConstrainedStdDev=std(R.H(r,tObs(~iout{r}))-Hhat(~iout{r}));
 
 
 disp(Err)
+
+figure(6)
+plot([min(Hobs(r,~iout{r})) max(Hobs(r,~iout{r}))],[min(Hobs(r,~iout{r})) max(Hobs(r,~iout{r}))],'k-'); 
+hold on;
+plot(R.H(r,tObs(~iout{r})),Hobs(r,~iout{r}),'ro','LineWidth',2,'MarkerSize',10); 
+plot(R.H(r,tObs(~iout{r})),Hhat(~iout{r}),'bx','LineWidth',2,'MarkerSize',10); 
+hold off
+set(gca,'FontSize',14)
+xlabel('True Height, m')
+ylabel('SWOT Height, m')
+legend('1:1','Observations','Constrained Obs','Location','Best')
+title(['Fig. 6: Observed and constrained width for reach ' num2str(r)])
+grid on;

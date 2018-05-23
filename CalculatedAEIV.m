@@ -1,6 +1,6 @@
 function [dAhat,What,Hhat,dAunc] = CalculatedAEIV(Hobs,Wobs,Hbp,p,nReg,dAHbar,sigma_ee,sigma_uu,m_ZZ,nObs)
 
-%0) Integrate function: this will be removed as it's a trivial computation
+%0) Integrate function
 for i=1:nReg
     pi{i}=polyint(p{i});
 end
@@ -26,29 +26,43 @@ if OutOfBound
 end
 
 %2) Find region
-if Hobs>=max(Hbp)
+if isnan(Hbp(3))
+    iReg=1;    
+elseif Hobs>=max(Hbp)
     iReg=nReg;
 else
     iReg=find(Hobs>=Hbp, 1, 'last' ); %region of the curve that H falls into
 end
 
 %3) Compute height estimate Hhat using observed W
-Hhat=EstimateH(Wobs,Hobs,p{iReg},sigma_ee,sigma_uu);
-
-%4) Check region of updated Hhat. If it's changed, then update Hhat again
-if Hhat>=max(Hbp)
-    iRegHat=nReg;
+if (var(Hobs)-sigma_uu)/sigma_uu > 2
+    lowHsnr=false;
+    Hhat=EstimateH(Wobs,Hobs,p{iReg},sigma_ee,sigma_uu);    
 else
-    iRegHat=find(Hhat>=Hbp, 1, 'last' ); %region of the curve that H falls into
+    lowHsnr=true;
+    Hhat=Hobs;
 end
 
-if iRegHat~=iReg
-    iReg=iRegHat;
-    Hhat=EstimateH(Wobs,Hobs,p{iReg},sigma_ee,sigma_uu);
+%4) Check region of updated Hhat. If it's changed, then update Hhat again
+if ~isnan(Hbp(3))
+    if Hhat>=max(Hbp)
+        iRegHat=nReg;
+    else
+        iRegHat=find(Hhat>=Hbp, 1, 'last' ); %region of the curve that H falls into
+    end
+
+    if iRegHat~=iReg
+        iReg=iRegHat;
+        Hhat=EstimateH(Wobs,Hobs,p{iReg},sigma_ee,sigma_uu);
+    end
 end
 
 %5) compute estimated W to go with estimated H. Note that this is 1.3.18 in Fuller
-What=polyval(p{iReg},Hhat);
+if lowHsnr
+    What=Wobs;
+else
+    What=polyval(p{iReg},Hhat);
+end
 
 %6) estimate polynomial uncertainty. Shortcut: m_ZZ averaged over all of the sub-domains. 
 % VarBeta=ComputeSlopeUncertainty(p{iReg}(1),sigma_uu,sigma_ee,m_ZZ,nObs);
