@@ -34,9 +34,28 @@ nReg=3; %number of regions
 tObs=t; 
 nObs=length(tObs);
 
-%% 4. Visualize height-width relationship 
-r=4;
+ReDoFits=true;
+if ReDoFits
+    stdH=0.5;
+    stdW=10;
+    Hobs=R.H(:,tObs)+stdH.*randn(nR,nObs);
+    Wobs=R.W(:,tObs)+stdW.*randn(nR,nObs);    
+    save('HWData.mat','Hobs','Wobs','stdH','stdW')
+else
+    load HWData
+end
 
+
+%% 4. Visualize height-width relationship  & summary statistics
+Hbar=median(Hobs,2);
+Wbar=median(Wobs,2);
+m_zz=nan(2,2,nR);  %m_zz is the W-H observation covariance matrix for each reach
+for i=1:nR    
+    m_zz(:,:,i)=cov(Wobs(i,:),Hobs(i,:));
+end    
+
+
+r=4;
 disp(['Working with reach ' num2str(r)])
 
 figure(1)
@@ -49,51 +68,8 @@ grid on
 
 
 %% 5. Fitting funtions to the width & height data
+[p,xbreak,iout,hval,wval,UseReg] = FitData(ReDoFits,nR,Wobs,stdW,Hobs,stdH,nReg);
 
-ReDoFits=true;
-if ReDoFits
-    stdH=0.1;
-    stdW=10;
-    Hobs=R.H(:,tObs)+stdH.*randn(nR,nObs);
-    Wobs=R.W(:,tObs)+stdW.*randn(nR,nObs);
-    Hbar=median(Hobs,2);
-    Wbar=median(Wobs,2);
-    
-    disp('Re-computing fits. This takes a while...')
-    
-    for i=1:nR  %fit H-W functions
-        disp(['Computing fit for reach ' num2str(i) '/' num2str(nR)])
-        SpecialCases{i} = CheckSpecialCases(Wobs(i,:),stdW,Hobs(i,:),stdH);
-        if SpecialCases{i}.LowWidthVar
-            p{i}{1}=[0 mean(Wobs(i,:))]; p{i}{2}=[]; p{i}{3}=[]; p{i}{4}=[];
-            xbreak{i}=[min(Hobs(i,:)) max(Hobs(i,:)+1E-4) nan nan];
-            iout{i}=false(size(Wobs(i,:)));
-            [hval{i},wval{i}]=TestEvaluation(Hobs(i,:),xbreak{i},p{i},nReg);
-            UseReg{i}=[1 0 0 ];
-        elseif SpecialCases{i}.LowHeightVar
-            p{i}{1}=polyfit(Hobs(i,:),Wobs(i,:),1);
-%             if var(Hobs(i,:))>1.25*stdH^2
-%                 p{i}{1}(1)=p{i}{1}(1)*var(Hobs)/(var(Hobs)-stdH^2); %Fuller's attenuation coefficient: untested so far
-%             end
-            p{i}{2}=[]; p{i}{3}=[]; p{i}{4}=[];
-            xbreak{i}=[min(Hobs(i,:)) max(Hobs(i,:)+1E-4) nan nan];
-            iout{i}=false(size(Wobs(i,:)));
-            [hval{i},wval{i}]=TestEvaluation(Hobs(i,:),xbreak{i},p{i},nReg);
-            UseReg{i}=[1 0 0 ];
-        else
-            [p{i},xbreak{i},iout{i},hval{i},wval{i}]=CalcWHFitsEIV(Hobs(i,:),Wobs(i,:),nReg,stdH,stdW);       
-            UseReg{i}=[1 1 1];
-        end
-    end
-    save('WHFits.mat','p','xbreak','iout','hval','wval','Hobs','Hbar','Wobs','Wbar','stdH','stdW','UseReg')
-else
-    load WHFits.mat
-end
-
-m_zz=nan(2,2,nR);  %m_zz is the W-H observation covariance matrix for each reach
-for i=1:nR    
-    m_zz(:,:,i)=cov(Wobs(i,:),Hobs(i,:));
-end
 
 figure(2)
 errorbar(Hobs(r,:),Wobs(r,:),stdW*ones(nObs,1),stdW*ones(nObs,1),stdH*ones(nObs,1),stdH*ones(nObs,1),'LineStyle','none','LineWidth',2,'Marker','o'); hold on
