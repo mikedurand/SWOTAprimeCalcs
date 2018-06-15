@@ -11,19 +11,18 @@ OutOfBound=Hobs>max(Hbp) | Hobs<min(Hbp);
 if OutOfBound    
     Hhat=nan;
     
-    if Hobs>max(Hbp)        
+    if Hobs>max(Hbp)
+        dAhat=polyval(pi{end},Hbp(end))-polyval(pi{end},Hbp(end-1))+dAHbar;
         if isempty(Wobs)
-            dAhat=dAHbar+(Hobs-Hbp(2))*polyval(p{1},Hbp(2)); %need to add support for non-1-region data
             What=nan;
             dAunc=nan;
-        else        
-            dAhat=polyval(pi{end},Hbp(end))-polyval(pi{end},Hbp(end-1))+dAHbar;
+        else            
             What=Wobs;  
             dAunc=sqrt(sigma_uu*Wobs^2+2*sigma_ee*(Hobs-Hbp(end))^2);
         end        
     else        
         if isempty(Wobs)
-            dAhat=-dAHbar-(Hbp(1)-Hobs)*polyval(p{1},Hbp(1));
+            
             What=nan;
             dAunc=nan;
         else            
