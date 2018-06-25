@@ -46,7 +46,7 @@ else
 end
 
 %3) Compute height estimate Hhat using observed W
-if (var(Hobs)-sigma_uu)/sigma_uu > 2
+if (m_ZZ(2,2)-sigma_uu)/sigma_uu > 2
     lowHsnr=false;
     Hhat=EstimateH(Wobs,Hobs,p{iReg},sigma_ee,sigma_uu);    
 else
