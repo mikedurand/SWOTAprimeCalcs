@@ -132,7 +132,9 @@ function lambda=RootsOfVarianceEqn(m_ZZ,sigma_ee,sigma_uu)
 
 %comptue the roots lambda of equation 1.3.26 in Fuller
 
-m_YY=m_ZZ(1,1); m_XX=m_ZZ(1,1); m_XY=m_ZZ(1,2);
+m_YY=m_ZZ(1,1); 
+m_XX=m_ZZ(2,2); 
+m_XY=m_ZZ(1,2);
 
 a=sigma_ee*sigma_uu;
 b=-(sigma_uu*m_YY+sigma_ee*m_XX);
